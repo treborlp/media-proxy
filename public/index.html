@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="1075734220565-c0ja67a2gtvf7adpvoagu86c3e1cfg0s.apps.googleusercontent.com">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Sign Google</h1>
+    <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    <a href="#" onclick="signOut();">Sign out</a>
+
+</body>
+
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+
+<script>
+    function onSignIn(googleUser) {
+        var profile = googleUser.getBasicProfile();
+        console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+        console.log('Name: ' + profile.getName());
+        console.log('Image URL: ' + profile.getImageUrl());
+        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+        const id_token = googleUser.getAuthResponse().id_token;
+
+        var url = window.location.host.includes('localhost') ?
+            "http://localhost:8080/api/auth/google" : "https://rob-restnode.herokuapp.com/api/auth/google"
+
+
+        fetch(url, {
+                method: 'POST', // or 'PUT'
+                body: JSON.stringify({
+                    id_token
+                }), // data can be `string` or {object}!
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => res.json())
+            .catch(error => console.error('Error:', error))
+            .then(response => console.log('Success:', response));
+    }
+
+
+
+    function signOut() {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function() {
+            console.log('User signed out.');
+        });
+    }
+</script>
+
+</html>
